@@ -9,5 +9,18 @@ setup (
     url='https://github.com/tlatsas/jinja2-highlight',
     license='GNU GPLv3',
     packages=['jinja2_highlight'],
-    install_requires=['Jinja2>=2.4'],
+    install_requires=[
+        'Jinja2>=2.4',
+        'Pygments>=1.5'
+    ],
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Programming Language :: Python',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Text Processing :: Markup :: HTML'
+    ],
 )
