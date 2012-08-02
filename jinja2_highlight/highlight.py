@@ -2,7 +2,7 @@
 
 import sys
 from jinja2 import nodes
-from jinja2.ext import Extension
+from jinja2.ext import Extension, Markup
 
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
@@ -56,4 +56,6 @@ class HighlightExtension(Extension):
             sys.exit(1)
 
         formatter = HtmlFormatter()
-        return highlight(body, lexer, formatter)
+        code = highlight(body, lexer, formatter)
+        return Markup(code).unescape()
+
