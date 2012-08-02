@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="{{ url_for('static', filename='code.css') }}" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <div>
+            Hello! The following code snippet is highlighted using jinja2-pygments.
+        </div>
+        <div>
+{% highlight 'python' %}
+from fridge import Beer
+
+glass = Beer(lt=500)
+glass.drink()
+{% endhighlight %}
+        </div>
+    </body>
+</html>
