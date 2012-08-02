@@ -9,4 +9,5 @@ setup (
     url='https://github.com/tlatsas/jinja2-highlight',
     license='GNU GPLv3',
     packages=['jinja2_highlight'],
+    install_requires=['Jinja2>=2.4'],
 )
