@@ -4,6 +4,7 @@ setup (
     name='jinja2-highlight',
     version='0.2',
     description='Jinja2 extension to highlight source code using Pygments',
+    keywords = 'syntax highlighting',
     author='Tasos Latsas',
     author_email='tlatsas2000@gmail.com',
     url='https://github.com/tlatsas/jinja2-highlight',
