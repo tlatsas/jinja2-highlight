@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup (
     name='jinja2-highlight',
-    version='0.2.2',
+    version='0.3',
     description='Jinja2 extension to highlight source code using Pygments',
     keywords = 'syntax highlighting',
     author='Tasos Latsas',
