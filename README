@@ -1,0 +1,37 @@
+*** jinja2-highlight ***
+
+About:
+
+    A simple Jinja2 template engine extension that uses Pygments to highlight
+    code blocks.
+
+
+Source:
+
+    Github:
+    https://github.com/tlatsas/jinja2-highlight
+
+    Pypi:
+    http://pypi.python.org/pypi/jinja2-highlight/
+
+
+Requirements:
+
+    * Jinja2 >= 2.4
+    * Pygments >= 1.5
+
+
+Highlight statement:
+
+    {% highlight 'language' %}
+    code-goes-here
+    {% endhighlight %}
+
+    Replace `language` with the appropriate Pygments lexer short name:
+    http://pygments.org/docs/lexers/
+
+
+Using with Flask framework:
+
+    See example at:
+    https://github.com/tlatsas/jinja2-highlight/tree/master/examples/flask
