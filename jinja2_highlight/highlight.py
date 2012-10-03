@@ -56,6 +56,6 @@ class HighlightExtension(Extension):
             sys.exit(1)
 
         formatter = HtmlFormatter()
-        code = highlight(body, lexer, formatter)
-        return Markup(code).unescape()
+        code = highlight(Markup(body).unescape(), lexer, formatter)
+        return code
 
