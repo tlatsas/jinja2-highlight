@@ -26,7 +26,7 @@ class HighlightExtension(Extension):
     tags = set(['highlight'])
 
     def parse(self, parser):
-        lineno = parser.stream.next().lineno
+        lineno = next(parser.stream).lineno
 
         # TODO:
         # add support to show line numbers
