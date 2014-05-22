@@ -1,0 +1,15 @@
+language: python
+python:
+  - "2.7"
+  - "3.3"
+install:
+  - "python setup.py install"
+email:
+  on_success: change
+  on_failure: change
+branches:
+  only:
+    - master
+    - development
+script:
+  - "python -m unittest discover"
