@@ -1,4 +1,4 @@
-jnija2-highlight
+jinja2-highlight
 ################
 
 About
