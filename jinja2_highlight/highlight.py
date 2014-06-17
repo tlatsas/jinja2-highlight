@@ -33,19 +33,33 @@ class HighlightExtension(Extension):
 
         # extract the language if available
         if not parser.stream.current.test('block_end'):
-            lang = parser.parse_expression()
+            args = [parser.parse_expression()]
+
+            if parser.stream.skip_if('comma'):
+                args.append(parser.parse_expression())
+            else:
+                args.append(nodes.Const(None))
         else:
-            lang = nodes.Const(None)
+            args = [nodes.Const(None)]
 
         # body of the block
         body = parser.parse_statements(['name:endhighlight'], drop_needle=True)
 
-        return nodes.CallBlock(self.call_method('_highlight', [lang]),
+        return nodes.CallBlock(self.call_method('_highlight', args),
                                [], [], body).set_lineno(lineno)
 
-    def _highlight(self, lang, caller=None):
+    def _highlight(self, lang, linenos, caller=None):
         # highlight code using Pygments
         body = caller()
+
+        if 'jinja2_highlight_cssclass' in self.environment.globals:
+            cssclass = self.environment.globals['jinja2_highlight_cssclass']
+        else:
+            cssclass = None
+
+        if linenos:
+            linenos = 'inline'
+
         try:
             if lang is None:
                 lexer = guess_lexer(body)
@@ -55,7 +69,10 @@ class HighlightExtension(Extension):
             print(e)
             sys.exit(1)
 
-        formatter = HtmlFormatter()
+        if cssclass is not None:
+            formatter = HtmlFormatter(cssclass=cssclass, linenos=linenos)
+        else:
+            formatter = HtmlFormatter(linenos=linenos)
         code = highlight(Markup(body).unescape(), lexer, formatter)
         return code
 
