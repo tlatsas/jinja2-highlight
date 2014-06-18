@@ -110,9 +110,10 @@ class HighlightExtension(Extension):
 
         # Check the globals to see if a cssclass setting for Pygment's HtmlFormatter
         # has been set
-        if 'jinja2_highlight_cssclass' in self.environment.globals:
-            cssclass = self.environment.globals['jinja2_highlight_cssclass']
-        else:
+
+        try:
+            cssclass = self.environment.jinja2_highlight_cssclass
+        except AttributeError:
             cssclass = None
 
         try:
@@ -140,6 +141,6 @@ class HighlightExtension(Extension):
         # The result will have an extra blank line underneath, use strip
         # to remove extraneous white space? Will this cause issues?
         # Maybe just use rstrip instead?
-        code = highlight(Markup(body.strip()).unescape(), lexer, formatter)
+        code = highlight(Markup(body.rstrip()).unescape(), lexer, formatter)
         return code
 
