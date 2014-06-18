@@ -10,7 +10,7 @@ from pygments.formatters import HtmlFormatter
 from pygments.util import ClassNotFound
 
 class HighlightExtension(Extension):
-    """Highlight code blocks using Pygments
+    """Highlight code blocks using Pygments.
 
     Example::
 
@@ -22,19 +22,31 @@ class HighlightExtension(Extension):
         pint_glass.drink()
 
         {% endhighlight %}
+
+    Line numbers can be turned in if True is passed in addition to the language.
+
+        {% highlight 'python', True %}
+
+        from fridge import Beer
+
+        pint_glass = Beer()
+        pint_glass.drink()
+
+        {% endhighlight %}
     """
     tags = set(['highlight'])
 
+    # TO DO: What if they want line numbers but don't pass the language?
+    # E.g. {% highlight True %}
+
     def parse(self, parser):
         lineno = next(parser.stream).lineno
-
-        # TODO:
-        # add support to show line numbers
 
         # extract the language if available
         if not parser.stream.current.test('block_end'):
             args = [parser.parse_expression()]
 
+            # If there's a comma, get the next argument
             if parser.stream.skip_if('comma'):
                 args.append(parser.parse_expression())
             else:
@@ -73,6 +85,12 @@ class HighlightExtension(Extension):
             formatter = HtmlFormatter(cssclass=cssclass, linenos=linenos)
         else:
             formatter = HtmlFormatter(linenos=linenos)
-        code = highlight(Markup(body).unescape(), lexer, formatter)
+        # If you place the tag on the line under the code, like this;
+        # pint_glass.drink()
+        # {% endhighlight %}
+        # The result will have an extra blank line underneath, use strip
+        # to remove extraneous white space? Will this cause issues?
+        # Maybe just use rstrip instead?
+        code = highlight(Markup(body.strip()).unescape(), lexer, formatter)
         return code
 
