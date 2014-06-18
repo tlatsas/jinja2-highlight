@@ -23,9 +23,20 @@ class HighlightExtension(Extension):
 
         {% endhighlight %}
 
-    Line numbers can be turned in if True is passed in addition to the language.
+    Line numbers can be turned on if it is assigned. Either 'inline' or 'table'
+    settings in Pygments can be used.
 
-        {% highlight 'python', True %}
+        {% highlight 'python', lineno='inline' %}
+
+        from fridge import Beer
+
+        pint_glass = Beer()
+        pint_glass.drink()
+
+        {% endhighlight %}
+
+    Line numbers can also be used even if no language is assigned.
+        {% highlight lineno='table' %}
 
         from fridge import Beer
 
@@ -42,17 +53,50 @@ class HighlightExtension(Extension):
     def parse(self, parser):
         lineno = next(parser.stream).lineno
 
-        # extract the language if available
+        # extract the language and line numbering setting if available
         if not parser.stream.current.test('block_end'):
-            args = [parser.parse_expression()]
-
-            # If there's a comma, get the next argument
-            if parser.stream.skip_if('comma'):
-                args.append(parser.parse_expression())
+            # If first up we have line number setting, lineno='inline', work with that
+            if parser.stream.current.type == 'name':
+                name = parser.stream.expect('name')
+                # If the assign is lineno
+                if name.value == 'lineno':
+                    if parser.stream.skip_if('assign'):
+                        # Assume no language and then add the assigned line number setting
+                        args = [nodes.Const(None)]
+                        args.append(parser.parse_expression())
+                # If it's not a lineno, ignore it
+                else:
+                    if parser.stream.skip_if('assign'):
+                        next(parser.stream)
+                        # Set our language and line number setting as None
+                        args = [nodes.Const(None), nodes.Const(None)]
             else:
-                args.append(nodes.Const(None))
+                # Otherwise if our first item is not a line numbering setting,
+                # assume it's the language setting
+                args = [parser.parse_expression()]
+
+                # If we have a comma next
+                if parser.stream.skip_if('comma'):
+                    # Check to see if we have a lineno assignment
+                    if parser.stream.current.type == 'name':
+                        name = parser.stream.expect('name')
+                        if name.value == 'lineno':
+                            if parser.stream.skip_if('assign'):
+                                args.append(parser.parse_expression())
+                        # If the name of the variable being assigned is not lineno
+                        # ignore it
+                        else:
+                            if parser.stream.skip_if('assign'):
+                                next(parser.stream)
+                                args.append(nodes.Const(None))
+                # Otherwise if there's nothing after the language, set the
+                # line number setting as None
+                else:
+                    args.append(nodes.Const(None))
         else:
-            args = [nodes.Const(None)]
+            # Otherwise if there are no additional arguments, set lang
+            # and line numbering to None
+            args = [nodes.Const(None), nodes.Const(None)]
 
         # body of the block
         body = parser.parse_statements(['name:endhighlight'], drop_needle=True)
@@ -64,13 +108,12 @@ class HighlightExtension(Extension):
         # highlight code using Pygments
         body = caller()
 
+        # Check the globals to see if a cssclass setting for Pygment's HtmlFormatter
+        # has been set
         if 'jinja2_highlight_cssclass' in self.environment.globals:
             cssclass = self.environment.globals['jinja2_highlight_cssclass']
         else:
             cssclass = None
-
-        if linenos:
-            linenos = 'inline'
 
         try:
             if lang is None:
@@ -81,10 +124,16 @@ class HighlightExtension(Extension):
             print(e)
             sys.exit(1)
 
+        # Set the cssclass if we have one
+        # The linenos setting expects either 'inline' or 'table', as per Pygment's
+        # settings, any true value except 'inline' results in 'table'. If linenos
+        # hasn't been assigned in parse it will be None and will result in no
+        # line numbers
         if cssclass is not None:
             formatter = HtmlFormatter(cssclass=cssclass, linenos=linenos)
         else:
             formatter = HtmlFormatter(linenos=linenos)
+
         # If you place the tag on the line under the code, like this;
         # pint_glass.drink()
         # {% endhighlight %}
