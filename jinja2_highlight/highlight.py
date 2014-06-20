@@ -52,7 +52,7 @@ class HighlightExtension(Extension):
 
         # extract the language and line numbering setting if available
         if not parser.stream.current.test('block_end'):
-            # If first up we have line number setting, lineno='inline', work with that
+            # If first up we have an assignment, e.g. lineno='inline', work with that
             if parser.stream.current.type == 'name':
                 name = parser.stream.expect('name')
                 # If the assign is lineno
@@ -61,7 +61,7 @@ class HighlightExtension(Extension):
                         # Assume no language and then add the assigned line number setting
                         args = [nodes.Const(None)]
                         args.append(parser.parse_expression())
-                # If it's not a lineno, ignore it
+                # If it's not a lineno assignment, ignore it
                 else:
                     if parser.stream.skip_if('assign'):
                         next(parser.stream)
