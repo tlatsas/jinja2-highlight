@@ -134,8 +134,9 @@ class HighlightExtension(Extension):
         # If you place the tag on the line under the code, like this;
         # pint_glass.drink()
         # {% endhighlight %}
-        # The result will have an extra blank line underneath, use rstrip
-        # to remove extraneous white space? Will this cause issues?
+        # The result will have an extra blank line underneath, this can cause an extra
+        # blank line of line numbering.
+        # Use rstrip to remove extraneous white space? Will this cause issues?
         code = highlight(Markup(body.rstrip()).unescape(), lexer, formatter)
         return code
 
