@@ -47,9 +47,6 @@ class HighlightExtension(Extension):
     """
     tags = set(['highlight'])
 
-    # TO DO: What if they want line numbers but don't pass the language?
-    # E.g. {% highlight True %}
-
     def parse(self, parser):
         lineno = next(parser.stream).lineno
 
@@ -110,7 +107,6 @@ class HighlightExtension(Extension):
 
         # Check the globals to see if a cssclass setting for Pygment's HtmlFormatter
         # has been set
-
         try:
             cssclass = self.environment.jinja2_highlight_cssclass
         except AttributeError:
@@ -138,9 +134,8 @@ class HighlightExtension(Extension):
         # If you place the tag on the line under the code, like this;
         # pint_glass.drink()
         # {% endhighlight %}
-        # The result will have an extra blank line underneath, use strip
+        # The result will have an extra blank line underneath, use rstrip
         # to remove extraneous white space? Will this cause issues?
-        # Maybe just use rstrip instead?
         code = highlight(Markup(body.rstrip()).unescape(), lexer, formatter)
         return code
 
