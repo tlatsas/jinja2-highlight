@@ -67,7 +67,7 @@ In jinja this can be done after you've created your environment;
 In Flask this can be done with the following (after creating your app):
 ::
 
-    app.jinja_env.extend(jinja2_highlight_divname = 'codehilite')
+    app.jinja_env.extend(jinja2_highlight_cssclass = 'codehilite')
 
 
 
