@@ -3,3 +3,5 @@
 build/
 dist/
 jinja2_highlight.egg-info/
+.idea
+*.iml
