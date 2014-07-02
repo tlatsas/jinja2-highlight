@@ -136,7 +136,7 @@ class HighlightExtension(Extension):
         # {% endhighlight %}
         # The result will have an extra blank line underneath, this can cause an extra
         # blank line of line numbering.
-        # Use rstrip to remove extraneous white space? Will this cause issues?
+        # Use rstrip to remove extraneous white space
         code = highlight(Markup(body.rstrip()).unescape(), lexer, formatter)
         return code
 
