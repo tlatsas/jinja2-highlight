@@ -26,7 +26,7 @@ Requirements
 * Pygments >= 1.5
 
 
-Highlight example
+Highlight examples
 =================
 ::
 
@@ -35,6 +35,40 @@ Highlight example
     {% endhighlight %}
 
 Replace `language` with the appropriate Pygments lexer short name: http://pygments.org/docs/lexers/
+
+Line numbering can be turned on using `lineno='inline'` or `lineno='table'` depending on the style of line numbering you want (as per Pygment's documentation: http://pygments.org/docs/formatters/#HtmlFormatter)
+
+::
+
+    {% highlight 'language', lineno='inline' %}
+    your-awesome-code-here
+    {% endhighlight %}
+
+This can also be used without a language setting
+
+::
+
+    {% highlight lineno='table' %}
+    your-awesome-code-here
+    {% endhighlight %}
+
+Optional settings
+================
+
+By default Pygments renders the code block inside a div with the class 'highlight', if you want to change the name you can set the environment variable `jinja2_highlight_cssclass` to the class name you would like.
+
+In jinja this can be done after you've created your environment;
+::
+
+    env = Environment(extensions=['jinja2_highlight.HighlightExtension'])
+    # Set the css class name to 'codehilite'
+    env.extend(jinja2_highlight_cssclass = 'codehilite')
+
+In Flask this can be done with the following (after creating your app):
+::
+
+    app.jinja_env.extend(jinja2_highlight_cssclass = 'codehilite')
+
 
 
 Using with Flask
