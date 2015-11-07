@@ -177,3 +177,22 @@ class HighlightExtensionTestCase(unittest.TestCase):
         ''')
 
         self.assertHtmlListEqual(tpl.render().split(), self.cssclass_rendered)
+
+    plaintext_rendered = [
+        u'<div',
+        u'class="highlight"><pre>',
+        u'abcdefg',
+        u'</pre></div>'
+    ]
+
+    def test_unrecognized_language_defaults_to_plaintext(self):
+        env = Environment(extensions=['jinja2_highlight.HighlightExtension'])
+
+        # Unrecognized language
+        tpl = env.from_string('''
+            {% highlight %}
+               abcdefg
+            {% endhighlight %}
+        ''')
+
+        self.assertHtmlListEqual(tpl.render().split(), self.plaintext_rendered)
