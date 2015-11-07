@@ -6,6 +6,7 @@ from jinja2.ext import Extension, Markup
 
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
+from pygments.lexers.special import TextLexer
 from pygments.formatters import HtmlFormatter
 from pygments.util import ClassNotFound
 
@@ -118,8 +119,8 @@ class HighlightExtension(Extension):
             else:
                 lexer = get_lexer_by_name(lang, stripall=False)
         except ClassNotFound as e:
-            print(e)
-            sys.exit(1)
+            # default to the plaintext lexer
+            lexer = TextLexer()
 
         # Set the cssclass if we have one
         # The linenos setting expects either 'inline' or 'table', as per Pygment's
