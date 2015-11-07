@@ -94,52 +94,58 @@ class HighlightExtensionTestCase(unittest.TestCase):
         assert tpl.render().split() == self.table_rendered
 
     inline_no_lang_rendered = [
-                u'<div',
-                u'class="highlight"><pre><span',
-                u'class="lineno">1</span>',
-                u'<span',
-                u'class="n">print</span><span',
-                u'class="p">(</span><span',
-                u'class="s">&quot;Hello',
-                u'world&quot;</span><span',
-                u'class="p">)</span>',
-                u'</pre></div>'
-            ]
+        u'<div',
+        u'class="highlight"><pre><span',
+        u'class="lineno">1',
+        u'</span>',
+        u'<span',
+        u'class="kn">from</span>',
+        u'<span',
+        u'class="nn">mypackage.mymodule</span>',
+        u'<span',
+        u'class="kn">import</span>',
+        u'<span',
+        u'class="n">myfn</span>',
+        u'</pre></div>'
+    ]
 
     def test_python_tpl_with_inline_no_lang(self):
         env = Environment(extensions=['jinja2_highlight.HighlightExtension'])
         tpl = env.from_string('''
             {% highlight lineno="inline" %}
-               print("Hello world")
+               from mypackage.mymodule import myfn
             {% endhighlight %}
         ''')
 
         assert tpl.render().split() == self.inline_no_lang_rendered
 
     table_no_lang_rendered = [
-                u'<table',
-                u'class="highlighttable"><tr><td',
-                u'class="linenos"><div',
-                u'class="linenodiv"><pre>1</pre></div></td><td',
-                u'class="code"><div',
-                u'class="highlight"><pre>',
-                u'<span',
-                u'class="n">print</span><span',
-                u'class="p">(</span><span',
-                u'class="s">&quot;Hello',
-                u'world&quot;</span><span',
-                u'class="p">)</span>',
-                u'</pre></div>',
-                u'</td></tr></table>'
-            ]
+        u'<table',
+        u'class="highlighttable"><tr><td',
+        u'class="linenos"><div',
+        u'class="linenodiv"><pre>1</pre></div></td><td',
+        u'class="code"><div',
+        u'class="highlight"><pre>',
+        u'<span',
+        u'class="kn">from</span>',
+        u'<span',
+        u'class="nn">mypackage.mymodule</span>',
+        u'<span',
+        u'class="kn">import</span>',
+        u'<span',
+        u'class="n">myfn</span>',
+        u'</pre></div>',
+        u'</td></tr></table>'
+    ]
 
     def test_python_tpl_with_table_no_lang(self):
         env = Environment(extensions=['jinja2_highlight.HighlightExtension'])
         tpl = env.from_string('''
             {% highlight lineno="table" %}
-               print("Hello world")
+               from mypackage.mymodule import myfn
             {% endhighlight %}
         ''')
+
 
         assert tpl.render().split() == self.table_no_lang_rendered
 
