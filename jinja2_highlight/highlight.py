@@ -50,56 +50,39 @@ class HighlightExtension(Extension):
 
     def parse(self, parser):
         lineno = next(parser.stream).lineno
+        valid_arguments = ('lineno',)
+        parsed_args = {}
 
         # extract the language and line numbering setting if available
-        if not parser.stream.current.test('block_end'):
-            # If first up we have an assignment, e.g. lineno='inline', work with that
-            if parser.stream.current.type == 'name':
+        while not parser.stream.current.test('block_end'):
+            cur_token_type = parser.stream.current.type
+            # If up we have an assignment, e.g. lineno='inline', work with that
+            if cur_token_type == 'name':
                 name = parser.stream.expect('name')
-                # If the assign is lineno
-                if name.value == 'lineno':
-                    if parser.stream.skip_if('assign'):
-                        # Assume no language and then add the assigned line number setting
-                        args = [nodes.Const(None)]
-                        args.append(parser.parse_expression())
-                # If it's not a lineno assignment, ignore it
+                if name.value in valid_arguments and parser.stream.skip_if('assign'):
+                    parsed_args[name.value] = parser.parse_expression()
                 else:
-                    if parser.stream.skip_if('assign'):
-                        next(parser.stream)
-                        # Set our language and line number setting as None
-                        args = [nodes.Const(None), nodes.Const(None)]
+                    parser.fail('Unrecognized argument %s' % name.value)
+            elif cur_token_type == 'string':
+                # The only valid string argument is the language
+                parsed_args['lang'] = parser.parse_expression()
             else:
-                # Otherwise if our first item is not a line numbering setting,
-                # assume it's the language setting
-                args = [parser.parse_expression()]
+                parser.fail('Unexpected %s encountered' % cur_token_type)
 
-                # If we have a comma next
-                if parser.stream.skip_if('comma'):
-                    # Check to see if we have a lineno assignment
-                    if parser.stream.current.type == 'name':
-                        name = parser.stream.expect('name')
-                        if name.value == 'lineno':
-                            if parser.stream.skip_if('assign'):
-                                args.append(parser.parse_expression())
-                        # If the name of the variable being assigned is not lineno
-                        # ignore it
-                        else:
-                            if parser.stream.skip_if('assign'):
-                                next(parser.stream)
-                                args.append(nodes.Const(None))
-                # Otherwise if there's nothing after the language, set the
-                # line number setting as None
-                else:
-                    args.append(nodes.Const(None))
-        else:
-            # Otherwise if there are no additional arguments, set lang
-            # and line numbering to None
-            args = [nodes.Const(None), nodes.Const(None)]
+            # Skip over optional commas
+            parser.stream.skip_if('comma')
 
         # body of the block
         body = parser.parse_statements(['name:endhighlight'], drop_needle=True)
 
-        return nodes.CallBlock(self.call_method('_highlight', args),
+        # The args passed to call_method below need to be a list, but we can at
+        # least set the order here.
+        parsed_args_list = [
+            parsed_args.get('lang', nodes.Const(None)),
+            parsed_args.get('lineno', nodes.Const(None))
+        ]
+
+        return nodes.CallBlock(self.call_method('_highlight', parsed_args_list),
                                [], [], body).set_lineno(lineno)
 
     def _highlight(self, lang, linenos, caller=None):
