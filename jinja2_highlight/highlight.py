@@ -50,39 +50,36 @@ class HighlightExtension(Extension):
 
     def parse(self, parser):
         lineno = next(parser.stream).lineno
-        valid_arguments = ('lineno',)
+
+        # NOTE: The _highlight function parameter order must match the order of arg_list
+        arg_list = ['lang', 'lineno']
         parsed_args = {}
 
-        # extract the language and line numbering setting if available
         while not parser.stream.current.test('block_end'):
-            cur_token_type = parser.stream.current.type
+            this_token_type = parser.stream.current.type
+
             # If up we have an assignment, e.g. lineno='inline', work with that
-            if cur_token_type == 'name':
+            if this_token_type == 'name':
                 name = parser.stream.expect('name')
-                if name.value in valid_arguments and parser.stream.skip_if('assign'):
+                if name.value in arg_list and parser.stream.skip_if('assign'):
                     parsed_args[name.value] = parser.parse_expression()
                 else:
-                    parser.fail('Unrecognized argument %s' % name.value)
-            elif cur_token_type == 'string':
-                # The only valid string argument is the language
+                    parser.fail('Unrecognized argument: %s' % name.value)
+            elif this_token_type == 'string':
+                # The only valid string literal argument is the language itself
                 parsed_args['lang'] = parser.parse_expression()
             else:
-                parser.fail('Unexpected %s encountered' % cur_token_type)
+                parser.fail('Unexpected %s encountered' % this_token_type)
 
             # Skip over optional commas
             parser.stream.skip_if('comma')
 
-        # body of the block
+        args = [parsed_args.get(a, nodes.Const(None)) for a in arg_list]
+
+        # body of the block (the source code we want to highlight)
         body = parser.parse_statements(['name:endhighlight'], drop_needle=True)
 
-        # The args passed to call_method below need to be a list, but we can at
-        # least set the order here.
-        parsed_args_list = [
-            parsed_args.get('lang', nodes.Const(None)),
-            parsed_args.get('lineno', nodes.Const(None))
-        ]
-
-        return nodes.CallBlock(self.call_method('_highlight', parsed_args_list),
+        return nodes.CallBlock(self.call_method('_highlight', args),
                                [], [], body).set_lineno(lineno)
 
     def _highlight(self, lang, linenos, caller=None):
