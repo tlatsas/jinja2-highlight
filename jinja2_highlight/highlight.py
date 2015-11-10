@@ -5,7 +5,9 @@ from jinja2 import nodes
 from jinja2.ext import Extension, Markup
 
 from pygments import highlight
-from pygments.lexers import get_lexer_by_name, guess_lexer
+from pygments.lexers import(
+    get_lexer_by_name, guess_lexer, guess_lexer_for_filename
+)
 from pygments.lexers.special import TextLexer
 from pygments.formatters import HtmlFormatter
 from pygments.util import ClassNotFound
@@ -16,6 +18,18 @@ class HighlightExtension(Extension):
     Example::
 
         {% highlight 'python' %}
+
+        from fridge import Beer
+
+        pint_glass = Beer()
+        pint_glass.drink()
+
+        {% endhighlight %}
+
+    If you are unable to provide the language to the highlight extension but can
+    provide the filename, use the filename option.
+
+        {% highlight filename="beer.py" %}
 
         from fridge import Beer
 
@@ -52,7 +66,7 @@ class HighlightExtension(Extension):
         lineno = next(parser.stream).lineno
 
         # NOTE: The _highlight function parameter order must match the order of arg_list
-        arg_list = ['lang', 'lineno']
+        arg_list = ['lang', 'lineno', 'filename']
         parsed_args = {}
 
         while not parser.stream.current.test('block_end'):
@@ -82,7 +96,7 @@ class HighlightExtension(Extension):
         return nodes.CallBlock(self.call_method('_highlight', args),
                                [], [], body).set_lineno(lineno)
 
-    def _highlight(self, lang, linenos, caller=None):
+    def _highlight(self, lang, linenos, filename, caller=None):
         # highlight code using Pygments
         body = caller()
 
@@ -94,10 +108,12 @@ class HighlightExtension(Extension):
             cssclass = None
 
         try:
-            if lang is None:
-                lexer = guess_lexer(body)
-            else:
+            if lang is not None:
                 lexer = get_lexer_by_name(lang, stripall=False)
+            elif filename is not None:
+                lexer = guess_lexer_for_filename(filename, body)
+            else:
+                lexer = guess_lexer(body)
         except ClassNotFound as e:
             # default to the plaintext lexer
             lexer = TextLexer()

@@ -34,6 +34,16 @@ class HighlightExtensionTestCase(unittest.TestCase):
 
         self.assertHtmlListEqual(tpl.render().split(), self.rendered)
 
+    def test_python_tpl_by_filename(self):
+        env = Environment(extensions=['jinja2_highlight.HighlightExtension'])
+        tpl = env.from_string('''
+            {% highlight filename="hello.py" %}
+               print("Hello world")
+            {% endhighlight %}
+        ''')
+
+        self.assertHtmlListEqual(tpl.render().split(), self.rendered)
+
     def test_python_tpl_with_autoescape(self):
         # See: https://github.com/tlatsas/jinja2-highlight/pull/1
         env = Environment(extensions=['jinja2_highlight.HighlightExtension'])
